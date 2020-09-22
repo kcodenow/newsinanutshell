@@ -2,33 +2,28 @@ from nian_auth import NIANAuthenticate
 import requests
 
 url = ('http://newsapi.org/v2/top-headlines?'
-       'country=ie&'
+       'pageSize=8&'
        'apiKey=XOX')
-response = requests.get(url).json()
-status = response['status']
 
-if(status == 'ok'):
-	print('OK, fetching news ...' + '\n\n')
-	articles = response['articles']
+fields = {'country':None, 'category':None, 'sources':None, 'q':None, 'page_size':8, 'page':None}
+response = requests.get(url, params=fields)
+
+if response.status_code in [200, 201]:
+	print('OK! Fetching your News in a Nutshell ...' + '\n')
+	articles = response.json()['articles']
 	for article in articles:
 		print(article['title'] + '\n' + article['url'] + '\n')
-
-quick_links={
-	'everything': '',
-	'uk_news': '',
-	'uk_sports': '',
-	'us_news': '',
-	'us_sports': '',
-}
+else:
+	print(str(response.status_code) + '\n' + response.text)
 
 
 URL_TOP_HEADLINES = 'https://newsapi.org/v2/top-headlines'
 
 class NewsInANutshell(object):
 	def __init__(self, api_key):
-		self.auth() = NIANAuthenticate(api_key=api_key)
+		self.auth = NIANAuthenticate(api_key=api_key)
 
-	def get_news(self, country=None, category=None, sources=None, q=None, page_size=None, page=1):
+	def get_news(self, country=None, category=None, sources=None, q=None, page_size=8, page=1):
 		fields={}
 
 		# TODO - check valid strings
@@ -51,4 +46,4 @@ class NewsInANutshell(object):
 			for article in articles:
 				print(article['title'] + '\n' + article['url'] + '\n')
 		else:
-			print(response.status_code + ' - response was not OK')
+			print(response.status_code + ' - ' + response.text)
